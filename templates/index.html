@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Loan Default Prediction</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Loan Default Prediction</h1>
+    <form method="post" action="/predict">
+        {% for feature in features %}
+            <div>
+                <label for="{{ feature.name }}">{{ feature.name }}:</label>
+                {% if feature.type == "categorical" %}
+                    <select name="{{ feature.name }}" id="{{ feature.name }}">
+                        {% for option in feature.options %}
+                            <option value="{{ option }}" {% if default_values[feature.name] == option %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                {% else %}
+                    <input
+                        type="number"
+                        step="any"
+                        name="{{ feature.name }}"
+                        id="{{ feature.name }}"
+                        value="{{ default_values[feature.name] }}"
+                        min="{{ feature.min }}"
+                        max="{{ feature.max }}"
+                        required
+                    >
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if result %}
+        <div class="result">
+            <h2>Prediction Result</h2>
+            <p><strong>Prediction (0/1):</strong> {{ result.prediction }}</p>
+            <p><strong>Probability of Default:</strong> {{ result.probability }}</p>
+            <p><strong>Result:</strong>
+                {% if result.prediction == 1 %}
+                    The applicant is <span style="color:red;">likely to default</span> on the loan.
+                {% else %}
+                    The applicant is <span style="color:green;">not likely to default</span> on the loan.
+                {% endif %}
+            </p>
+        </div>
+    {% endif %}
+
+    {% if error %}
+        <div class="error">
+            <h2>Error</h2>
+            <p>{{ error }}</p>
+        </div>
+    {% endif %}
+</body>
+</html>
