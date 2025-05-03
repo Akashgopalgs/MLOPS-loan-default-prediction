@@ -8,17 +8,23 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y curl
 
 # Download the model file from GitHub into the /app directory
-RUN curl -L https://github.com/Akashgopalgs/MLOPS-loan-default-prediction/raw/main/src/models/randomforest_best_model.pkl -o /app/randomforest_best_model.pkl
+RUN curl -L https://github.com/Akashgopalgs/MLOPS-loan-default-prediction/raw/main/src/models/randomforest_best_model.pkl \
+    -o /app/randomforest_best_model.pkl
 
-# Copy project files
+# Copy the rest of your project files
 COPY . .
 
-# Install dependencies
+# Upgrade pip
 RUN pip install --upgrade pip
+
+# Install your project dependencies
 RUN pip install -r requirements.txt
 
-# Expose the port
+# Pin joblib to the same version you used locally
+RUN pip install joblib==1.4.2
+
+# Expose the FastAPI port
 EXPOSE 8000
 
-# Run the FastAPI app (adjust path if needed)
+# Start the FastAPI app
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
