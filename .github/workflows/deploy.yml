@@ -1,0 +1,36 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 🔄 Checkout Code
+      uses: actions/checkout@v3
+
+    - name: 🛠️ Set up SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+    - name: 🔐 Add Host to Known Hosts
+      run: |
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+    - name: 🚀 Deploy to EC2 and Build Docker
+      run: |
+        ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          cd ~/your-project-folder-name || mkdir ~/your-project-folder-name && cd ~/your-project-folder-name
+          rm -rf *
+          git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git .
+          docker build -t your-app .
+          docker stop app || true
+          docker rm app || true
+          docker run -d --name app -p 80:80 your-app
+        EOF
