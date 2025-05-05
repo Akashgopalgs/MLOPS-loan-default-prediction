@@ -2,8 +2,7 @@ fastapi
 uvicorn
 pandas
 scikit-learn
-joblib
 jinja2
-pandas
 numpy
 boto3
+
