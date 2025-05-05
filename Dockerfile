@@ -4,23 +4,27 @@ FROM python:3.10-slim
 # Set working directory
 WORKDIR /app
 
-# Install curl and git
+# Install curl (for downloading the model)
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends curl git \
-  && rm -rf /var/lib/apt/lists/*
+ && apt-get install -y --no-install-recommends curl \
+ && rm -rf /var/lib/apt/lists/*
 
-# Download the model file from GitHub
+# Create the models folder
+RUN mkdir -p src/models
+
+# Download the exact model you tested locally 
+# directly into src/models so your app loads that one
 RUN curl -L \
-  https://github.com/Akashgopalgs/MLOPS-loan-default-prediction/raw/main/src/models/randomforest_best_model.pkl \
-  -o /app/randomforest_best_model.pkl
+    https://github.com/Akashgopalgs/MLOPS-loan-default-prediction/raw/main/src/models/randomforest_best_model.pkl \
+    -o /app/src/models/randomforest_best_model.pkl
 
-# Copy the rest of your project
+# Copy the rest of your project (minus the old model)
 COPY . .
 
 # Upgrade pip
 RUN pip install --upgrade pip
 
-# Install your requirements
+# Install dependencies
 RUN pip install -r requirements.txt
 
 # Pin joblib to the version you trained with
