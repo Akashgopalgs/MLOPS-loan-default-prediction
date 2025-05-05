@@ -20,7 +20,7 @@ COPY . .
 # Upgrade pip
 RUN pip install --upgrade pip
 
-# Install your requirements
+# Install your requirements, make sure 'joblib' is pinned in requirements.txt
 RUN pip install -r requirements.txt
 
 # **Pin joblib** to exactly the version you trained with
@@ -29,5 +29,5 @@ RUN pip install joblib==1.4.2
 # Expose FastAPI port
 EXPOSE 8000
 
-# Launch
+# Launch the application
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
