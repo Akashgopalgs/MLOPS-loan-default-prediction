@@ -27,8 +27,8 @@ jobs:
       run: |
         ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           cd ~/loan-prediction-app || mkdir ~/loan-prediction-app && cd ~/loan-prediction-app
-          rm -rf *
-          git clone https://github.com/akashgopalgs/MLOPS-loan-default-prediction.git .
+          rm -rf ./*
+          git clone https://github.com/Akashgopalgs/MLOPS-loan-default-prediction.git .
           docker build -t loan_pred_docker_img .
           docker stop app || true
           docker rm app || true
