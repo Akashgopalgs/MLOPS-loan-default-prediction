@@ -26,11 +26,11 @@ jobs:
     - name: 🚀 Deploy to EC2 and Build Docker
       run: |
         ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-          cd ~/your-project-folder-name || mkdir ~/your-project-folder-name && cd ~/your-project-folder-name
+          cd ~/loan-prediction-app || mkdir ~/loan-prediction-app && cd ~/loan-prediction-app
           rm -rf *
-          git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git .
-          docker build -t your-app .
+          git clone https://github.com/akashgopalgs/MLOPS-loan-default-prediction.git .
+          docker build -t loan_pred_docker_img .
           docker stop app || true
           docker rm app || true
-          docker run -d --name app -p 80:80 your-app
+          docker run -d --name app -p 80:80 loan_pred_docker_img
         EOF
