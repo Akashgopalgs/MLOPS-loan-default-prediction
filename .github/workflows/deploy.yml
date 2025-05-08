@@ -23,9 +23,12 @@ jobs:
       run: |
         ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-    - name: 🚀 Deploy to EC2 and Build Docker
+    - name: 🚀 Deploy and Run Docker on EC2
       run: |
-        ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          sudo apt update && sudo apt install -y git docker.io
+          sudo systemctl start docker
+          sudo systemctl enable docker
           cd ~/loan-prediction-app || mkdir ~/loan-prediction-app && cd ~/loan-prediction-app
           rm -rf ./*
           git clone https://github.com/Akashgopalgs/MLOPS-loan-default-prediction.git .
