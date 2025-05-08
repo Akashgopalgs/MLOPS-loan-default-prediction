@@ -6,4 +6,4 @@ numpy
 boto3
 scikit-learn==1.6.1
 joblib==1.4.2
-
+xgboost==1.7.6
