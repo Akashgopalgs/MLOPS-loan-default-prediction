@@ -1,6 +1,9 @@
 fastapi
 uvicorn
 pandas
-scikit-learn
-joblib
 jinja2
+numpy
+boto3
+scikit-learn==1.6.1
+joblib==1.4.2
+
