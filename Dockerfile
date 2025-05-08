@@ -16,6 +16,8 @@ COPY . .
 RUN pip install --upgrade pip \
  && pip install -r requirements.txt
 
-# Expose and run
-EXPOSE 8000
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Expose public port 80
+EXPOSE 80
+
+# Run the FastAPI app on port 80 for public access
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "80"]
