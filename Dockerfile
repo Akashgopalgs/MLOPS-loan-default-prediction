@@ -6,10 +6,15 @@ WORKDIR /app
 
 # Copy the requirements.txt file and install the dependencies
 COPY requirements.txt .
+
+# Install the required dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the application code into the container
 COPY . .
+
+# Ensure that the data folder (with required files) is also copied into the container
+COPY src/data/processed /app/src/data/processed
 
 # Train the model (you can specify your script here)
 RUN python src/models/train_model.py
