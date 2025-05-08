@@ -13,8 +13,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy all project files
 COPY . .
 
-# Upgrade pip and install Python dependencies
-RUN pip install --upgrade pip
+# Upgrade pip and install specific versions of scikit-learn and joblib
+RUN pip install --upgrade pip \
+ && pip install scikit-learn==1.6.1 joblib==1.4.2
+
+# Install remaining Python dependencies from requirements.txt
 RUN pip install -r requirements.txt
 
 # Expose port 80
