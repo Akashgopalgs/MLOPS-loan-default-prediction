@@ -1,27 +1,26 @@
-# Use Python 3.10 as base image
+# Use a base image with Python 3.10
 FROM python:3.10-slim
 
-# Set working directory inside container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Install system dependencies (optional but useful for some environments)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+# Copy the requirements.txt file and install the dependencies
+COPY requirements.txt .
 
-# Copy all project files
+# Install the required dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the application code into the container
 COPY . .
 
-# Upgrade pip and install specific versions of scikit-learn and joblib
-RUN pip install --upgrade pip \
- && pip install scikit-learn==1.6.1 joblib==1.4.2
+# Ensure that the data folder (with required files) is also copied into the container
+COPY src/data/processed /app/src/data/processed
 
-# Install remaining Python dependencies from requirements.txt
-RUN pip install -r requirements.txt
+# Train the model (you can specify your script here)
+RUN python src/models/train_model.py
 
-# Expose port 80
-EXPOSE 80
+# Expose the application port
+EXPOSE 8000
 
-# Run the FastAPI app
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "80"]
+# Start FastAPI app when the container runs
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
