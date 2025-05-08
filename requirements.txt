@@ -7,3 +7,4 @@ jinja2
 boto3
 joblib==1.5.0
 xgboost==1.7.6
+imbalanced-learn==0.10.1  # Add this line for SMOTE
