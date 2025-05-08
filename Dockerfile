@@ -1,23 +1,24 @@
-# Use Python 3.10
+# Use Python 3.10 as base image
 FROM python:3.10-slim
 
-# Set workdir
+# Set working directory inside container
 WORKDIR /app
 
-# Install curl (if you ever need it), strip cache
-RUN apt-get update \
- && apt-get install -y --no-install-recommends curl \
- && rm -rf /var/lib/apt/lists/*
+# Install system dependencies (optional but useful for some environments)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy all your source, including the correct model
+# Copy all project files
 COPY . .
 
-# Upgrade pip and install dependencies (pin joblib in requirements.txt)
-RUN pip install --upgrade pip \
- && pip install -r requirements.txt
+# Upgrade pip and install Python dependencies
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
-# Expose public port 80
+# Expose port 80
 EXPOSE 80
 
-# Run the FastAPI app on port 80 for public access
+# Run the FastAPI app
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "80"]
