@@ -18,19 +18,10 @@ templates = Jinja2Templates(directory="templates")
 
 # Load model, scaler, and feature columns
 BASE = Path(__file__).resolve().parent / "src" / "models"
-with open("randomforest_best_model.pkl", "rb") as f_in:
-    with gzip.open("randomforest_best_model.pkl.gz", "wb") as f_out:
-        shutil.copyfileobj(f_in, f_out)
-
-# Step 2: Load the compressed model
-with gzip.open("randomforest_best_model.pkl.gz", "rb") as f:
+with gzip.open(BASE / "randomforest_best_model.pkl.gz", "rb") as f:
     model = joblib.load(f)
-
-with gzip.open(BASE / "scaler.pkl.gz", "rb") as f:
-    scaler = joblib.load(f)
-
-with gzip.open(BASE / "feature_columns.pkl.gz", "rb") as f:
-    feature_columns = joblib.load(f)
+scaler = joblib.load(BASE / "scaler.pkl")
+feature_columns = pickle.load(open(BASE / "feature_columns.pkl", "rb"))
 
 # Input feature metadata
 FEATURES = [
