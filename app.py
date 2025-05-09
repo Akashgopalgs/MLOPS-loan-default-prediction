@@ -24,13 +24,13 @@ with open("randomforest_best_model.pkl", "rb") as f_in:
 
 # Step 2: Load the compressed model
 with gzip.open("randomforest_best_model.pkl.gz", "rb") as f:
-    model = pickle.load(f)
+    model = joblib.load(f)
 
 with gzip.open(BASE / "scaler.pkl.gz", "rb") as f:
-    scaler = pickle.load(f)
+    scaler = joblib.load(f)
 
 with gzip.open(BASE / "feature_columns.pkl.gz", "rb") as f:
-    feature_columns = pickle.load(f)
+    feature_columns = joblib.load(f)
 
 # Input feature metadata
 FEATURES = [
