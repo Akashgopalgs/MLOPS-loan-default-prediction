@@ -6,6 +6,7 @@ import pandas as pd
 import joblib
 import pickle
 from pathlib import Path
+import gzip
 
 app = FastAPI()
 
@@ -17,9 +18,14 @@ templates = Jinja2Templates(directory="templates")
 
 # Load model, scaler, and feature columns
 BASE = Path(__file__).resolve().parent / "src" / "models"
-model = joblib.load(BASE / "randomforest_best_model.pkl")
-scaler = joblib.load(BASE / "scaler.pkl")
-feature_columns = pickle.load(open(BASE / "feature_columns.pkl", "rb"))
+with gzip.open(BASE / "randomforest_best_model.pkl.gz", "rb") as f:
+    model = pickle.load(f)
+
+with gzip.open(BASE / "scaler.pkl.gz", "rb") as f:
+    scaler = pickle.load(f)
+
+with gzip.open(BASE / "feature_columns.pkl.gz", "rb") as f:
+    feature_columns = pickle.load(f)
 
 # Input feature metadata
 FEATURES = [
