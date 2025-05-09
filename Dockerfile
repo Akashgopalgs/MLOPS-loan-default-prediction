@@ -1,23 +1,19 @@
-# Use a base image with Python 3.10
-FROM python:3.10-slim
+# Use lightweight Python image
+FROM python:3.10-alpine
 
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy only the requirements file first to leverage Docker layer caching
+# Copy and install dependencies
 COPY requirements.txt .
-
-# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all remaining app files (code, model, etc.)
-COPY . .
+# Copy only necessary app code and model files
+COPY app.py .
+COPY src/models /app/src/models
 
-# 🚫 Removed heavy data folder to reduce memory usage
-# COPY src/data/processed /app/src/data/processed  ← Removed
-
-# Expose the port used by FastAPI
+# Expose FastAPI port
 EXPOSE 8000
 
-# Run FastAPI app with uvicorn
+# Run FastAPI app
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
