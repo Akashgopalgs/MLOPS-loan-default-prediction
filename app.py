@@ -16,12 +16,20 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Templates directory
 templates = Jinja2Templates(directory="templates")
 
-# Load model, scaler, and feature columns
-BASE = Path(__file__).resolve().parent / "src" / "models"
-with gzip.open(BASE / "randomforest_best_model.pkl.gz", "rb") as f:
-    model = joblib.load(f)
-scaler = joblib.load(BASE / "scaler.pkl")
-feature_columns = pickle.load(open(BASE / "feature_columns.pkl", "rb"))
+# Lazy loading variables
+model = None
+scaler = None
+feature_columns = None
+
+def get_assets():
+    global model, scaler, feature_columns
+    if model is None or scaler is None or feature_columns is None:
+        BASE = Path(__file__).resolve().parent / "src" / "models"
+        with gzip.open(BASE / "randomforest_best_model.pkl.gz", "rb") as f:
+            model = joblib.load(f)
+        scaler = joblib.load(BASE / "scaler.pkl")
+        feature_columns = pickle.load(open(BASE / "feature_columns.pkl", "rb"))
+    return model, scaler, feature_columns
 
 # Input feature metadata
 FEATURES = [
@@ -41,7 +49,6 @@ FEATURES = [
     {"name": "OCCUPATION_TYPE", "type": "categorical", "options": ["Laborers", "Sales staff", "Core staff", "Managers", "Drivers", "High skill tech staff", "Accountants", "Medicine staff", "Security staff", "Cleaning staff", "Cooking staff", "Private service staff", "Low-skill Laborers", "Waiters/barmen staff"]}
 ]
 
-# Set default values for each feature (can be customized further)
 DEFAULT_VALUES = {
     "EXT_SOURCE_2": 0.5,
     "EXT_SOURCE_3": 0.5,
@@ -73,13 +80,14 @@ async def predict(request: Request):
             value = form.get(name, "").strip()
             if not value:
                 raise ValueError(f"{name} cannot be empty")
-
             if feature["type"] == "float":
-                record[name] = float(value)  # Cast to float
+                record[name] = float(value)
             elif feature["type"] == "int":
-                record[name] = int(float(value))  # First convert to float, then to int
+                record[name] = int(float(value))
             else:
                 record[name] = value
+
+        model, scaler, feature_columns = get_assets()
 
         df = pd.DataFrame([record])
         df_encoded = pd.get_dummies(df)
@@ -93,7 +101,17 @@ async def predict(request: Request):
             "prediction": int(prediction),
             "probability": f"{probability:.2%}"
         }
-        return templates.TemplateResponse("index.html", {"request": request, "features": FEATURES, "result": result, "default_values": DEFAULT_VALUES})
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "features": FEATURES,
+            "result": result,
+            "default_values": DEFAULT_VALUES
+        })
 
     except Exception as e:
-        return templates.TemplateResponse("index.html", {"request": request, "features": FEATURES, "error": str(e), "default_values": DEFAULT_VALUES})
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "features": FEATURES,
+            "error": str(e),
+            "default_values": DEFAULT_VALUES
+        })
